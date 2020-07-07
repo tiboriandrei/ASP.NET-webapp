@@ -1,0 +1,146 @@
+﻿@model EventOrganizerWebApp.EventModel
+
+@{
+
+}
+
+<head>
+
+    <title>EditEvent_userview</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.5/css/bootstrap.min.css" integrity="sha384-AysaV+vQoT3kOAXZkl02PThvDr8HYKPZhNT5h/CXfBThSRXQ6jW5DO2ekP5ViFdi" crossorigin="anonymous">
+
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <script src="~/scripts/jquery-3.3.1.min.js"></script>
+    <script src="~/scripts/bootstrap.min.js"></script>
+    <link href="~/Content/dataTables.bootstrap4.min.css" rel="stylesheet" />
+    <script src="~/scripts/jquery.dataTables.min.js"></script>
+    <script src="~/scripts/dataTables.bootstrap4.min.js"></script>
+
+</head>
+<body>
+    <div>
+        <h4>EventModel</h4>
+        <hr />
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.EventName)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.EventName)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.EventDescription)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.EventDescription)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.StartDate)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.StartDate)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.EndDate)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.EndDate)
+            </dd>
+
+        </dl>
+    </div>
+    <p>
+        @Html.ActionLink("Edit", "Edit", new { /* id = Model.PrimaryKey */ }) |
+        @Html.ActionLink("Back to List", "Index")
+    </p>
+</body>
+
+<div class="container py-4">
+    <h4 class="text-center text-uppercase">Sarcinile mele</h4>
+    <div id="dataTable_wrapper2"></div>
+    <table id="dataTable3" class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Assignment Name</th>
+                <th>Assignment Description</th>
+                <th>Deadline</th>
+            </tr>
+        </thead>
+    </table>
+</div>
+
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jquery")
+    <script type="text/javascript">
+
+        function FormatJSONDate(str) {
+            var year, month, day, hour, minute, d, finalDate;
+
+            str = str.replace(/\D/g, "");
+            d = new Date(parseInt(str));
+
+            year = d.getFullYear();
+            month = pad(d.getMonth() + 1);
+            day = pad(d.getDate());
+            hour = pad(d.getHours());
+            minutes = pad(d.getMinutes());
+
+            finalDate = year + "-" + month + "-" + day + " " + hour + ":" + minutes;
+
+            function pad(num) {
+                num = "0" + num;
+                return num.slice(-2);
+            }
+
+            return finalDate;
+
+        };
+
+
+        $(function () {
+            $(document).ready(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "/Task/GetAssignmentsData",
+                    dataType: "json",
+                    success: function (json) {
+                        var tr;
+
+                        //Append each row to html table
+                        for (var i = 0; i < json.length; i++) {
+                            tr = $('<tr class="AssignmentName"/>');
+                            console.log(JSON.stringify(json[i]));
+                            //tr.append('<td class="Id">' + json[i].Id + '</td>');
+                            tr.append('<td class="AssignmentName">' + json[i].TaskName + '</td>');
+                            tr.append("<td>" + json[i].TaskDescription + "</td>");
+                            tr.append("<td>" + FormatJSONDate(json[i].Deadline) + "</td>");
+                            tr.append('<td> <button class="distribuie" type="submit">Am temrinat</button> </form> <button class="deleteTask" type="button">Anuleaza</button> </td>');
+                            $('#dataTable3').append(tr);
+                        }
+                    },
+                    failure: function (response) {
+                        alert(response.responseText);
+                    },
+                    error: function (response) {
+                        alert(response.responseText);
+                    }
+                });
+            });
+        });
+
+
+    </script>
+}

@@ -1,0 +1,479 @@
+﻿@model EventOrganizerWebApp.UserPageModel
+
+@{
+    ViewBag.Title = "Pagina principala";
+}
+
+<h2>Pagina principala</h2>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.5/css/bootstrap.min.css" integrity="sha384-AysaV+vQoT3kOAXZkl02PThvDr8HYKPZhNT5h/CXfBThSRXQ6jW5DO2ekP5ViFdi" crossorigin="anonymous">
+
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <script src="~/scripts/jquery-3.3.1.min.js"></script>
+    <script src="~/scripts/bootstrap.min.js"></script>
+    <link href="~/Content/dataTables.bootstrap4.min.css" rel="stylesheet" />
+    <script src="~/scripts/jquery.dataTables.min.js"></script>
+    <script src="~/scripts/dataTables.bootstrap4.min.js"></script>
+
+</head>
+
+
+<style>
+    #SearchNavBar, #SearchItemsContainer {
+        display:none; 
+    }
+    
+</style>
+
+<body>
+    <nav class="navbar navbar-light bg-faded">
+        <div id="SearchNavBar">
+            <form class="form-inline float-lg-left">
+                <button class="btn btn-outline-success" id="CloseAddFriendsButton">Close</button>
+                <input class="form-control" type="text" id="SearchBar" placeholder="Search" />
+            </form>
+        </div>
+
+        <div id="DefaultNavBar">
+            <button class="navbar-toggler hidden-lg-up" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation"></button>
+            <div class="collapse navbar-toggleable-md" id="navbarResponsive">
+                <a class="navbar-brand" href="#">Navbar</a>
+                <form class="form-inline float-lg-right">
+                    <button class="btn btn-outline-success" id="AddFriendsButton">Adauga prieteni</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid" id="SearchItemsContainer">
+        <div class="row">
+            <div class="col-xs-4" id="SearchItems">
+            </div>
+        </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js" integrity="sha384-3ceskX3iaEnIogmQchP8opvBy3Mi7Ce34nWjpBIwVTHfGYWQS9jwHDVRnpKKHJg7" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.3.7/js/tether.min.js" integrity="sha384-XTs3FgkjiBgo8qjEjBk0tGmf3wPrWtA6coPfQDfFEY8AnYJwjalXCiosYRBIBZX8" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.5/js/bootstrap.min.js" integrity="sha384-BLiI7JTZm+JWlgKa0M0kGRpJbF2J8q+qreVrKBC47e3K6BW78kGLrCkeRX6I9RoK" crossorigin="anonymous"></script>
+
+</body>
+
+    <div>
+        <h4>Detalii cont:</h4>
+        <hr />
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.ID)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.ID)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.FirstName)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.FirstName)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.LastName)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.LastName)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.EmailAddress)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.EmailAddress)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.CellphoneNumber)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.CellphoneNumber)
+            </dd>
+
+        </dl>
+
+    </div>
+
+    <div class="form-group">
+        <div class="col-md-offset-0 col-md-50">
+            <input type="button" value="Creeaza un eveniment" class="btn btn-default" onclick="location.href='@Url.Action("CreateEvent")'" />
+        </div>
+    </div>
+
+    <div class="container py-4">
+        <h4 class="text-center text-uppercase">Lista de evenimente</h4>
+        <div id="dataTable_wrapper"></div>
+        <table id="dataTable" class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nume</th>
+                    <th>Descriere</th>
+                    <th>Data start</th>
+                    <th>Data incheiere</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+
+    <div class="container py-4">
+        <h4 class="text-center text-uppercase">Invitatii</h4>
+        <div id="dataTable_wrapper2"></div>
+        <table id="dataTable2" class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Event ID</th>
+                    <th>Status</th>                    
+                </tr>
+            </thead>
+        </table>
+    </div>
+
+
+    <p>
+        @*@Html.ActionLink("Edit", "Edit", new { id = Model.ID }) |
+            @Html.ActionLink("Back to List", "Index")*@
+    </p>
+
+
+    @section Scripts {
+        @Scripts.Render("~/bundles/jquery")
+
+        <script type="text/javascript">
+
+            var user = { id: "", firstName: "", lastName: "", emailAddress: "", phoneNr: "" };
+            
+            var emailList = [];
+
+            $(document).ready(function () {
+
+                function ToggleSearch(event) {
+                    event.preventDefault();
+
+                    $("#DefaultNavBar").toggle();
+                    $("#SearchNavBar").toggle();
+
+                    $("#SearchItemsContainer").toggle();
+                }
+
+                $("#AddFriendsButton").click(function (event) {
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/Home/GetUsersData",
+                        dataType: "json",
+                        success: function (json) {
+                            for (var i = 0; i < json.length; i++) {
+                                //user.id = json[i].Id;
+                                //user.firstName = json[i].FirstName;
+                                //user.lastName = json[i].LastName;
+                                //user.emailAddress = json[i].EmailAddress;
+                                //user.phoneNr = json[i].CellphoneNumber;
+                                emailList.push(json[i].EmailAddress);
+                            }
+
+                            for (var i = 0; i < searchItems.length; i++) {
+                                console.log(emailList[i].emailAddress);
+                            }
+                        },
+                        failure: function (response) {
+                            alert(response.responseText);
+                        },
+                        error: function (response) {
+                            alert(response.responseText);
+                        }
+                    });
+
+
+                    ToggleSearch(event);
+                });
+
+                $("#CloseAddFriendsButton").click(function (event) {
+                    ToggleSearch(event);
+                });
+
+                function addFriend() {
+                    alert("friend added");
+                }
+
+                $("#SearchBar").keyup(function () {
+                    $("#SearchItems").empty();
+                    
+                    for (var i = 0; i < emailList.length; i++) {
+                        if (emailList[i].toLowerCase().includes($("#SearchBar").val().toLowerCase().trim())
+                            && $("#SearchBar").val().trim().length > 0)
+                        {
+                            $("#SearchItems").append("<a href='javascript:alert(&quot; Friend Added! &quot;);'>" + emailList[i] + "</a>");
+                        }
+                    }
+                });
+
+            });
+
+            function FormatJSONDate(str) {
+                var year, month, day, hour, minute, d, finalDate;
+
+                str = str.replace(/\D/g, "");
+                d = new Date(parseInt(str));
+
+                year = d.getFullYear();
+                month = pad(d.getMonth() + 1);
+                day = pad(d.getDate());
+                hour = pad(d.getHours());
+                minutes = pad(d.getMinutes());
+
+                finalDate = year + "-" + month + "-" + day + " " + hour + ":" + minutes;
+
+                function pad(num) {
+                    num = "0" + num;
+                    return num.slice(-2);
+                }
+
+                return finalDate;
+
+            };
+
+            $(document).on('click', '.getId', function () {
+                var $rowID = $(this).closest('tr').find('.Id').text();
+
+                option = {
+                    url: "/Event/fn1",
+                    dataType: "json",
+                    type: "POST",
+                    //contentType: 'application/json',
+                    data: { "Id": $rowID },
+                    success: function (data) {
+                        // alert(data);
+                    },
+                    failure: function (errMsg) {
+                        alert(errMsg);
+                    }
+                };
+
+                $.ajax(option);
+
+            });
+
+            $(document).on('click', '.deleteEvent', function () {
+
+                if (confirm("Evenimentul va fi sters. Ok?")) {
+
+                    var $rowID = $(this).closest('tr').find('.Id').text();
+
+                    option = {
+                        url: "/Event/deleteEvent",
+                        dataType: "text",
+                        type: "POST",
+                        //contentType: 'application/json',
+                        data: { "Id": $rowID },
+                        success: function () {
+                            window.location.href = "UserPage";
+                        },
+                        failure: function (errMsg) {
+                            alert(errMsg);
+                        }
+                    };
+
+                    $.ajax(option);
+                }
+            });
+
+
+            $(document).on('click', '.acceptInv', function () {
+
+                if (confirm("Confirmati acceptarea invitatiei.")) {
+
+                    var $rowID = $(this).closest('tr').find('.Invitatii').text();
+
+                    option1 = {
+                        url: "/Event/fn1",
+                        dataType: "json",
+                        type: "POST",
+                        //contentType: 'application/json',
+                        data: { "Id": $rowID },
+                        success: function (data) {
+                            // alert(data);
+                        },
+                        failure: function (errMsg) {
+                            alert(errMsg);
+                        }
+                    };
+
+                    $.ajax(option1);
+
+                    option = {
+                        url: "/Event/acceptInv",
+                        dataType: "text",
+                        type: "POST",
+                        //contentType: 'application/json',
+                        data: { "Id": $rowID },
+                        success: function () {
+                            window.location.href = "UserPage";
+                        },
+                        failure: function (errMsg) {
+                            alert(errMsg);
+                        }
+                    };
+
+                    $.ajax(option);
+                }
+            });
+
+            $(document).on('click', '.refuseInv', function () {
+
+                if (confirm("Confirmati refuzarea invitatiei.")) {
+
+                    var $rowID = $(this).closest('tr').find('.Invitatii').text();
+
+                    option1 = {
+                        url: "/Event/fn1",
+                        dataType: "json",
+                        type: "POST",
+                        //contentType: 'application/json',
+                        data: { "Id": $rowID },
+                        success: function (data) {
+                            // alert(data);
+                        },
+                        failure: function (errMsg) {
+                            alert(errMsg);
+                        }
+                    };
+
+                    $.ajax(option1);
+
+                    option = {
+                        url: "/Event/refuseInv",
+                        dataType: "text",
+                        type: "POST",
+                        //contentType: 'application/json',
+                        data: { "Id": $rowID },
+                        success: function () {
+                            window.location.href = "UserPage";
+                        },
+                        failure: function (errMsg) {
+                            alert(errMsg);
+                        }
+                    };
+
+                    $.ajax(option);
+                }
+            });
+
+
+            $(function () {
+                $(document).ready(function () {
+                    $.ajax({
+                        type: "POST",
+                        url: "/Home/GetEventData",
+                        dataType: "json",
+                        success: function (json) {
+                            var tr;
+
+                            //Append each row to html table
+                            for (var i = 0; i < json.length; i++) {
+                                tr = $('<tr class="Id"/>');
+                                console.log(JSON.stringify(json[i]));
+                                tr.append('<td class="Id">' + json[i].Id + '</td>');
+                                tr.append("<td>" + json[i].EventName + "</td>");
+                                tr.append("<td>" + json[i].EventDescription + "</td>");
+                                tr.append("<td>" + FormatJSONDate(json[i].StartDate) + "</td>");
+                                tr.append("<td>" + FormatJSONDate(json[i].EndDate) + "</td>");
+                                tr.append('<td> <form action="/Event/EditEvent" method="POST"> <button class="getId" type="submit">Edit</button> </form> <button class="deleteEvent" type="button">Delete</button> </td>');
+                                $('#dataTable').append(tr);
+                            }
+                        },
+                        failure: function (response) {
+                            alert(response.responseText);
+                        },
+                        error: function (response) {
+                            alert(response.responseText);
+                        }
+                    });
+                });
+            });
+
+            $(document).on('click', '.eventLink', function (event) {
+
+                    option = {
+                        url: "/Event/fn1",
+                        dataType: "json",
+                        type: "POST",
+                        //contentType: 'application/json',
+                        data: { "Id": event.target.id },
+                        success: function (data) {
+                            // alert(data);
+                        },
+                        failure: function (errMsg) {
+                            alert(errMsg);
+                        }
+                    };
+
+                    $.ajax(option);
+
+                    option = {
+                        url: "/Event/EditEvent_userview",
+                        dataType: "text",
+                        type: "POST",
+                        //data: { "adr": event.target.id },
+                        success: function () {
+                            window.location.href = "/Event/EditEvent_userview";
+                        },
+                        failure: function (errMsg) {
+                            alert(errMsg);
+                        }
+                    };
+
+                    $.ajax(option);
+                
+            });
+
+
+            $(function () {
+                $(document).ready(function () {
+                    $.ajax({
+                        type: "POST",
+                        url: "/Home/GetUserEventsData",
+                        dataType: "json",
+                        success: function (json) {
+                            var tr;
+                            //Append each row to html table
+                            for (var i = 0; i < json.length; i++) {
+                                tr = $('<tr class="Invitatii"/>');
+                                console.log(JSON.stringify(json[i]));
+                                tr.append('<td class="Invitatii">' + "<a class='eventLink' id=" + json[i].EventID + " href='javascript:alert(&quot; Mergem la pagina eventului! &quot;);'>" + json[i].EventID + "</a>" + '</td>');
+                                tr.append("<td>" + json[i].InviteStatus + "</td>");                               
+                                tr.append('<td> <form action="/Event/acceptInv" method="POST"> <button class="acceptInv" type="submit">Accept</button> </form> <button class="refuseInv" type="button">Refuse</button> </td>');
+                                $('#dataTable2').append(tr);
+                            }
+                        },
+                        failure: function (response) {
+                            alert(response.responseText);
+                        },
+                        error: function (response) {
+                            alert(response.responseText);
+                        }
+                    });
+                });
+            });
+
+
+        </script>
+
+    }
