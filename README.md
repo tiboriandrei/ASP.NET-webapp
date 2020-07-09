@@ -1,5 +1,5 @@
 # ASP.NET-webapp
-using javascript, jQuery, Bootstrap, MySQLServer, MVC
+using javascript, jQuery, MySQLServer, MVC
 
 My javascript & jQuery code is located in:
 EventOrganizerWebApp -> Views -> Shared -> UserPage.cshtml
