@@ -1,0 +1,6 @@
+﻿CREATE TABLE [dbo].[eventID] (
+    [ID]          INT DEFAULT ((1)) NOT NULL,
+    [LastEventID] INT DEFAULT ((10000)) NOT NULL,
+    CONSTRAINT [PK_eventID] PRIMARY KEY CLUSTERED ([ID] ASC)
+);
+
